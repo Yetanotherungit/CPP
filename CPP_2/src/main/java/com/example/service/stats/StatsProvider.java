@@ -1,5 +1,6 @@
 package com.example.service.stats;
 
+import com.example.service.process.Duet;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,18 @@ import java.util.stream.Collectors;
 @Service
 public class StatsProvider {
 
-    private static List<Integer> yearsList = new ArrayList<>();
+    private static List<Duet> duetList = new ArrayList<>();
 
     private static boolean shouldBeRecalculated = true;
 
     private Long totalRequests = 0L;
     private Long wrongRequests = 0L;
 
-    private Integer min = 0;
+    private Duet min = new Duet("0", 0);
 
-    private Integer max = 0;
+    private Duet max = new Duet("0", 0);
 
-    private Integer mostCommon = 0;
+    private Duet mostCommon = new Duet("0", 0);
 
 
     public void increaseTotalRequests() {
@@ -36,34 +37,34 @@ public class StatsProvider {
     }
 
     public Stats calculate() {
-        System.out.println(yearsList);
+        System.out.println(duetList);
 
         if (!shouldBeRecalculated) {
             return null;
         }
 
         try {
-            mostCommon = yearsList
+            mostCommon = duetList
                     .stream()
                     .reduce(
-                            BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(yearsList, o)))
-                    ).orElse(0);
+                            BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(duetList, o)))
+                    ).orElse(new Duet("0", 0));
 
-            yearsList = yearsList
+            duetList = duetList
                     .stream()
                     .distinct()
                     .sorted()
                     .collect(Collectors.toList());
 
-            min = yearsList
+            min = duetList
                     .stream()
-                    .min(Comparator.comparing(Long::valueOf))
-                    .orElse(0);
+                    .min(Comparator.comparing(Duet::getNumber))
+                    .orElse(new Duet("0", 0));
 
-            max = yearsList
+            max = duetList
                     .stream()
-                    .max(Comparator.comparing(Long::valueOf))
-                    .orElse(0);
+                    .max(Comparator.comparing(Duet::getNumber))
+                    .orElse(new Duet("0", 0));
 
             shouldBeRecalculated = false;
         } catch (NullPointerException exception) {
@@ -72,8 +73,9 @@ public class StatsProvider {
         return new Stats(totalRequests,wrongRequests,min,max,mostCommon);
     }
 
-    public void addRoot(@NotNull Integer year) {
-        yearsList.add(year);
+    public void addRoot(@NotNull String number, Integer system) {
+        Duet tmp = new Duet(number, system);
+        duetList.add(tmp);
         shouldBeRecalculated = true;
     }
 }

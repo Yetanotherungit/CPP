@@ -1,6 +1,6 @@
 package com.example.service.cache;
 
-import com.example.service.process.ProcessedParams;
+import com.example.service.process.Duet;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +10,11 @@ import java.util.Map;
 @Service
 public class Cache {
 
-    static public Map<Integer, ProcessedParams> cache = new HashMap<>();
+    static public Map<Duet, String> cache = new HashMap<>();
 
-    public void add(Integer year, ProcessedParams params) {
-        if (!cache.containsKey(year)) {
-            cache.put(year, params);
+    public void add(Duet input, String result) {
+        if (!cache.containsKey(input)) {
+            cache.put(input, result);
         }
     }
 
@@ -22,9 +22,9 @@ public class Cache {
         System.out.println(cache);
     }
 
-    public @Nullable ProcessedParams find(Integer year) {
-        if (cache.containsKey(year)) {
-            return cache.get(year);
+    public @Nullable String find(Duet input) {
+        if (cache.containsKey(input)) {
+            return cache.get(input);
         }
         return null;
     }

@@ -30,34 +30,45 @@ public class Solution {
         this.statsProvider = statsProvider;
     }
 
-    public boolean checkYear(Integer year) {
-        return year != null && year >= 0;
+    public boolean checkNumber(String number, Integer system) {
+
+
+        return true;
     }
 
-    public ProcessedParams calculateOutputParams(Integer year) {
+    public String Convert(String number, Integer system) {
         statsProvider.increaseTotalRequests();
-        if (!checkYear(year)) {
+
+        if (!checkNumber(number, system)) {
             statsProvider.increaseWrongRequests();
-            throw new RuntimeException("Incorrect year!");
+            throw new RuntimeException("Incorrect number!");
         }
 
-        int days;
-        ProcessedParams temp = cache.find(year);
+        Duet test = new Duet(number, system);
+        String tmp = cache.find(test);
 
-        // not found
-        if (temp == null) {
+        if (tmp == null) {
             logger.warn("Calculating output parameters");
 
-            days = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 366 : 365;
-            boolean isLeapYear = days == 366;
+            if (system == 2) {
+                System.out.println(number);
+                int decimal = Integer.parseInt(number,2);
+                String dec = Integer.toBinaryString(decimal);
+                cache.add(test, dec);
+                statsProvider.addRoot(number, system);
+                return Integer.toString(decimal);
+            }
 
-            temp = new ProcessedParams(days, isLeapYear);
-            cache.add(year, temp);
-            statsProvider.addRoot(year);
-            return temp;
+            if (system == 10) {
+                int temp = Integer.parseInt(number);
+                String bin = Integer.toBinaryString(temp);
+                cache.add(test, bin);
+                statsProvider.addRoot(number, system);
+                return bin;
+            }
         }
 
-        return temp;
+        return "NOWAY";
     }
 
 }

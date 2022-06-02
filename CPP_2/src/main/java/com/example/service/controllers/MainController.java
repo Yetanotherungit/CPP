@@ -3,9 +3,8 @@ package com.example.service.controllers;
 import com.example.service.Config;
 import com.example.service.asyncCounter.AsyncCounter;
 import com.example.service.cache.Cache;
+import com.example.service.process.Duet;
 import com.example.service.process.Solution;
-import com.example.service.process.ProcessedParams;
-import com.example.service.responses.ExceptionResponse;
 import com.example.service.stats.Stats;
 import com.example.service.stats.StatsProvider;
 import org.jetbrains.annotations.NotNull;
@@ -14,10 +13,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class MainController {
@@ -39,12 +37,17 @@ public class MainController {
     }
 
     @GetMapping("/home")
-    public ResponseEntity<ProcessedParams> GetAnswer(
-            @RequestParam(value="year") Integer year) {
+    public ResponseEntity<String> GetAnswer(
+            @RequestParam(value="number") String number,
+                @RequestParam(value="system") Integer system){
 
         AsyncCounter.increase();
 
-        var params = solution.calculateOutputParams(year);
+        if (number == null) {
+            return new ResponseEntity<>("ERROR", HttpStatus.BAD_REQUEST);
+        }
+
+        var params = solution.Convert(number, system);
         return new ResponseEntity<>(params, HttpStatus.OK);
     }
 
@@ -54,21 +57,23 @@ public class MainController {
     }
 
     @PostMapping("/solve_json")
-    public ResponseEntity<ProcessedParams> solveSingleJson(
-            @RequestBody Integer params
+    public ResponseEntity<String> solveSingleJson(
+            @RequestBody Duet params
     ) {
-        var parameters = solution.calculateOutputParams(params);
+        System.out.println(params.getNumber());
+        var parameters = solution.Convert(params.getNumber(), params.getSystem());
         return new ResponseEntity<>(parameters, HttpStatus.OK);
     }
 
     @PostMapping("/solve_bulk")
-    public ResponseEntity<List<ProcessedParams>> solveBulkJson(
-            @RequestBody @NotNull List<Integer> params
+    public ResponseEntity<List<String>> solveBulkJson(
+            @RequestBody @NotNull List<Duet> params
     ) {
-        var list = params
-                .stream()
-                .map(solution::calculateOutputParams)
-                .collect(Collectors.toList());
+        var list = new ArrayList<String>();
+
+        for (Duet param : params) {
+            list.add(solution.Convert(param.getNumber(), param.getSystem()));
+        }
 
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

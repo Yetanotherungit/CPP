@@ -1,5 +1,7 @@
 package com.example.service.stats;
 
+import com.example.service.process.Duet;
+
 public class Stats {
 
     public Long getTotalRequests() {
@@ -10,27 +12,31 @@ public class Stats {
         return wrongRequests;
     }
 
-    public Integer getMin() {
+    public Duet getMin() {
         return min;
     }
 
-    public Integer getMax() {
+    public Duet getMax() {
         return max;
     }
 
-    public Integer getMostCommon() {
+    public Duet getMostCommon() {
         return mostCommon;
     }
 
     private Long totalRequests = 0L;
     private Long wrongRequests = 0L;
 
-    private Integer min = 0;
+    private Duet min = new Duet("0", 0);
 
-    private Integer max = 0;
+    private Duet max = new Duet("0", 0);
 
-    private Integer mostCommon = 0;
-    public Stats(Long total,Long wrong,Integer min,Integer max,Integer common){
+    private Duet mostCommon = new Duet("0", 0);
+    public Stats(Long total,
+                 Long wrong,
+                 Duet min,
+                 Duet max,
+                 Duet common) {
         totalRequests = total;
         wrongRequests = wrong;
         this.min = min;

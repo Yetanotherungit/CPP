@@ -21,10 +21,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class ServiceApplicationTests {
 
     @Test
-    void is2020LeapYear() {
-        var year = new Solution().calculateOutputParams(2020);
+    void calc1010() {
+        var res = new Solution().Convert("1010", 2);
 
-        assertThat(year).isEqualTo(true);
+        assertThat(res).isEqualTo(10);
     }
 
     @Test
